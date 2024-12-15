@@ -1,1 +1,150 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel-Based Terrain Rendering</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f6f8;
+            color: #333;
+            margin: 20px;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            font-size: 2.5em;
+        }
+        h2 {
+            font-size: 2em;
+        }
+        h3 {
+            font-size: 1.75em;
+        }
+        p {
+            margin: 10px 0;
+        }
+        ul, ol {
+            margin: 10px 0 10px 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #7b7b7b;
+            color: white;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Voxel-Based Terrain Rendering</h1>
+
+    <h2>SUMMARY</h2>
+    <p>We implemented voxel-based terrain rendering using Perspective Projection, leveraging OpenMP for parallelism on the CPU and CUDA on the GPU. This method projects the 2D map into a first-person perspective. To evaluate performance, we compared a baseline sequential CPU implementation against five parallel implementations on both CPU and GPU, each employing different scheduling strategies and scenarios. In addition to presenting speedup plots for each implementation, we provide an analysis of the algorithm’s limitations and methods to overcome these limitations.</p>
+
+    <h2>BACKGROUND</h2>
+    <p><strong>Key Data Structures:</strong></p>
+    <ul>
+        <li><strong>Height Map:</strong> A 2D array that stores the elevation data of the terrain.</li>
+        <li><strong>Color Map:</strong> A 2D array that stores RGB color data for terrain points.</li>
+        <li><strong>Screen Buffer:</strong> A 1D array representing the rendered image.</li>
+        <li><strong>Hidden Buffer:</strong> Tracks the lowest visible height for occlusion handling.</li>
+        <li><strong>Depth Pixel:</strong> Facilitates parallel rendering by storing projected height and color information.</li>
+    </ul>
+    <p><strong>Key Operations:</strong></p>
+    <ul>
+        <li>Depth Iteration: Iterates depths from front to back.</li>
+        <li>Column Iteration: Renders vertical lines for the screen columns.</li>
+        <li>Perspective Projection: Maps 3D terrain to 2D screen coordinates.</li>
+        <li>Column Drawing: Draws visible terrain between depths.</li>
+        <li>Occlusion Handling: Ensures only visible terrain is rendered.</li>
+    </ul>
+
+    <h2>APPROACH</h2>
+    <p><strong>Technologies Used:</strong></p>
+    <ul>
+        <li><strong>Language:</strong> C++</li>
+        <li><strong>Machines:</strong>
+            <ul>
+                <li>GHC Machine: Intel i7-9700 CPU and NVIDIA RTX2080 GPU</li>
+                <li>PSC Machine: AMD EPYC 7742 CPU and NVIDIA TESLA V100 GPU</li>
+            </ul>
+        </li>
+    </ul>
+    <p><strong>Implemented Versions:</strong></p>
+    <ul>
+        <li>Serial Implementation</li>
+        <li>CPU Parallel (OpenMP)</li>
+        <li>GPU Parallel:
+            <ul>
+                <li>launchKernelEveryDz</li>
+                <li>launchKernelOnce</li>
+                <li>parallelDz</li>
+                <li>Streaming</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>RESULTS</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>FPS</th>
+                <th>Speedup</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Serial</td>
+                <td>2.99</td>
+                <td>1.00</td>
+            </tr>
+            <tr>
+                <td>CPU Parallel</td>
+                <td>7.03</td>
+                <td>2.35</td>
+            </tr>
+            <tr>
+                <td>GPU LaunchKernelEveryDz</td>
+                <td>9.45</td>
+                <td>3.16</td>
+            </tr>
+            <tr>
+                <td>GPU LaunchKernelOnce</td>
+                <td>24.43</td>
+                <td>8.17</td>
+            </tr>
+            <tr>
+                <td>GPU ParallelDz</td>
+                <td>29.49</td>
+                <td>9.86</td>
+            </tr>
+            <tr>
+                <td>GPU Streaming</td>
+                <td>82.19</td>
+                <td>29.32</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>REFERENCES</h2>
+    <p>Voxel Space: <a href="https://github.com/s-macke/VoxelSpace" target="_blank">https://github.com/s-macke/VoxelSpace</a></p>
+
+</body>
+</html>
