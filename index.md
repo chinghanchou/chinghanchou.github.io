@@ -189,6 +189,8 @@ occlusion handling).
         * MergeDepthsKernel: Processes Depth Iteration, Column Drawing, Occlusion Handling, update hidden value. Thread Grid is 1D grid. Each block contains 256 threads. The number of blocks is ceil(WIDTH / threadsPerBlock).
     * Memory Usage: Added depth_buffer to store height and color data for each depth. This buffer decouples the projection computation from the rendering process, allowing these two stages to be independently optimized.
 
+    ![parallelDz](images/parallelDz.png)
+
     ```cpp
     void DrawFrontToBack(...) {
         // launch kernal
@@ -219,6 +221,9 @@ work, and then it continues the corresponding stream number to execute the colum
 task. The number of streams depends on how many images are rendered simultaneously.
 Streaming implementation executes perspective projection and column drawing of different
 images concurrently, increasing the utilization of SMs.
+
+![stream](images/stream.png)
+
     ```cpp
     for(total_frames / N){
         DrawFrontToBack(...) {
@@ -311,6 +316,8 @@ execution of column-drawing
 while maximizing hardware
 resource utilization.
 
+![speeduplimit](images/speeduplimit.png)
+
 * **GHC vs PSC**
 
     | Methods            | serial | cpu_parallel | gpu_launchKernelEveryDz | gpu_launchKernelOnce | gpu_parallelDz | gpu_streaming |
@@ -322,6 +329,8 @@ resource utilization.
     | **Speedup GHC**    | 1.00   | 2.35         | 3.16                     | 8.17                 | 9.86           | 29.32         |
     | **Speedup PSC**    | 1.00   | 1.12         | 2.80                     | 6.15                 | 9.02           | 88.29         |
 
+    ![ghc_psc](images/pscghcspeedup.png)
+    
     Comparing the performance of GHC and PSC, we observed several surprising results.
     * The GHC machine outperforms the PSC machine on serial implementation since GHC has a higher single-core clock speed.
     * When running CPU parallel code, the PSC machine performs slower than the GHC
@@ -380,6 +389,7 @@ resource utilization.
 **Problem Variation**
 * **Visible Distance**
 
+    ![visible](images/visibledistance.png)
     The number of depth iterations equals Visible
     Distance / Depth. Therefore, the decrease in
     Visible Distance should lead to speedup as both
@@ -391,6 +401,7 @@ resource utilization.
 
 * **Screen Size(Width)**
 
+    ![width](images/width.png)
     Reducing the output screen width from 700
     pixels to 350 pixels resulted in a 2x speedup for
     the serial implementation, as the total
@@ -410,6 +421,7 @@ resource utilization.
 
 * **Screen Size(Height)**
 
+    ![height](images/height.png)
     Reducing the output screen height from 512
     pixels to 256 pixels had no impact on
     performance across all implementations. This is
