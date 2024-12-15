@@ -7,10 +7,12 @@ SUMMARY
 
 We implemented voxel-based terrain rendering using Perspective Projection, leveraging OpenMP for parallelism on the CPU and CUDA on the GPU. This method projects the 2D map into a first-person perspective. To evaluate performance, we compared a baseline sequential CPU implementation against five parallel implementations on both CPU and GPU, each employing different scheduling strategies and scenarios. In addition to presenting speedup plots for each implementation, we provide an analysis of the algorithm’s limitations and methods to overcome these limitations.
 
-* Frame rendering: Shows the occlusion handling and perspective projection of the terrain.
+* **Frame rendering:** Shows the occlusion handling and perspective projection of the terrain.
+
 ![framegen](images/framegen.gif)
 
-* Step walk: Demonstrates the observer moving through the terrain.
+* **Step walk:** Demonstrates the observer moving through the terrain.
+
 ![stepwalk](images/stepwalk.gif)
 
 BACKGROUND
