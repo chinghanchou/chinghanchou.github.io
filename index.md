@@ -132,7 +132,7 @@ leverage OpenMP for parallelism. The optimization focuses on the screen renderin
 Within each depth layer, OpenMP is used to parallelize the rendering of vertical lines in the
 image. This approach enables parallel rendering of vertical sections, but the parallelism is
 limited to the image width due to dependencies between vertical pixels.
-#code
+
 ```cpp
 void DrawFrontToBack(...) {
     for depthNum { // Depth Iteration
@@ -151,18 +151,18 @@ void DrawFrontToBack(...) {
 
 **GPU Parallel**
 
-* **LaunchKernelEveryDz:** 
+* **launchKernelEveryDz:** 
 
     This code represents the initial implementation of GPU code. The parallelization mechanism
     is identical to that of the CPU portion. Within each depth layer, a GPU kernel is launched,
     enabling parallel rendering of each column.
 
-* Configuration: Each block contains 256 threads and each thread processes on column of
-the screen, computing its height and color and updating screen and hidden . The number
-of blocks is calculated as ceil(WIDTH / threadsPerBlock), with the last block
-processing fewer threads if the WIDTH can not be evenly divided. Every thread does
-Perspective Projection, Column Drawing, Occlusion Handling, update hidden value(for
-occlusion handling).
+    * Configuration: Each block contains 256 threads and each thread processes on column of
+    the screen, computing its height and color and updating screen and hidden . The number
+    of blocks is calculated as ceil(WIDTH / threadsPerBlock), with the last block
+    processing fewer threads if the WIDTH can not be evenly divided. Every thread does
+    Perspective Projection, Column Drawing, Occlusion Handling, update hidden value(for
+    occlusion handling).
 
     * Memory Usage:
         * Global Memory on GPU: hightMap, colorMap, screen, hidden
@@ -189,6 +189,22 @@ occlusion handling).
 * **launchKernalOnce:** 
 
     This code represents an enhanced version of the launchKernalEveryDz version. Depth iteration is performed directly within the kernel. Previously, if depth iteration required multiple kernels, this could result in higher overhead from repeated kernel launches. Consolidating this logic into a single kernel reduces this overhead. The memory access for heightmap and colormap remains coalesced. However, reducing multiple kernel launches potentially improves cache utilization because all depth layers for a particular vertical line are processed by the same thread.
+
+    ```cpp
+    void DrawFrontToBack(...) {
+        // launch kernal
+        // ---------- in each thread ----------
+        for depthNum { // Depth Iteration
+            // Perspective Projection
+            for verticalPixel { // Column Drawing
+                // Occlusion Handling
+                screen[i] = color
+            }
+            updateHiddenValue()
+        }
+        // ------------------------------------
+    }
+    ```
 
 * **parallelDz:** 
 
@@ -231,8 +247,6 @@ task. The number of streams depends on how many images are rendered simultaneous
 Streaming implementation executes perspective projection and column drawing of different
 images concurrently, increasing the utilization of SMs.
 
-    ![stream](images/stream.png)
-
     ```cpp
     for(total_frames / N){
         DrawFrontToBack(...) {
@@ -258,6 +272,8 @@ images concurrently, increasing the utilization of SMs.
         }
     }
     ```
+
+    ![stream](images/stream.png)
 
 RESULTS
 --------
@@ -308,24 +324,25 @@ RESULTS
     gaming scenarios.
 
 * **Speedup Limitations**
-The gpu_parallelDz implementation achieved 30 FPS but fell short of our target of 60 FPS.
-Additionally, considering the thousands of available CUDA cores, a 10x speedup is not
-particularly impressive. As the column-drawing stage is sequential and parallelism can only be
-applied across columns, we used CUDA streams to compute multiple frames concurrently.
-This approach preserves the sequential execution of column-drawing while maximizing
-hardware resource utilization.
-As the column-drawing stage is
-sequential and parallelism can
-only be applied across columns,
-we implemented CUDA streams
-to compute multiple frames
-concurrently. This approach
-preserves the sequential
-execution of column-drawing
-while maximizing hardware
-resource utilization.
 
-![speeduplimit](images/speeduplimit.png)
+    The gpu_parallelDz implementation achieved 30 FPS but fell short of our target of 60 FPS.
+    Additionally, considering the thousands of available CUDA cores, a 10x speedup is not
+    particularly impressive. As the column-drawing stage is sequential and parallelism can only be
+    applied across columns, we used CUDA streams to compute multiple frames concurrently.
+    This approach preserves the sequential execution of column-drawing while maximizing
+    hardware resource utilization.
+    As the column-drawing stage is
+    sequential and parallelism can
+    only be applied across columns,
+    we implemented CUDA streams
+    to compute multiple frames
+    concurrently. This approach
+    preserves the sequential
+    execution of column-drawing
+    while maximizing hardware
+    resource utilization.
+
+    ![speeduplimit](images/speeduplimit.png)
 
 * **GHC vs PSC**
 
@@ -373,6 +390,8 @@ resource utilization.
     | Number of Cores |  8   |  10  |  12  |  16  |  32  |  64  |
     |-----------------|------|------|------|------|------|------|
     | Time            |22.28 |23.29 |24.26 |38.71 |55.82 | 73.83|
+
+    ![falsesharing](images/falsesharing.png)
 
     The results indicate a lack of performance
     scaling with an increasing number of CPU
