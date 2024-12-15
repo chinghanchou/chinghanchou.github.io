@@ -189,7 +189,7 @@ occlusion handling).
         * MergeDepthsKernel: Processes Depth Iteration, Column Drawing, Occlusion Handling, update hidden value. Thread Grid is 1D grid. Each block contains 256 threads. The number of blocks is ceil(WIDTH / threadsPerBlock).
     * Memory Usage: Added depth_buffer to store height and color data for each depth. This buffer decouples the projection computation from the rendering process, allowing these two stages to be independently optimized.
 
-    ![parallelDz](images/parallelDz.png)
+    ![parallelDz](images/paralleldz.png)
 
     ```cpp
     void DrawFrontToBack(...) {
