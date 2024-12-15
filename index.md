@@ -1,5 +1,3 @@
-  Voxel-Based Terrain Rendering body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f5f6f8; color: #333; margin: 20px; padding: 20px; } h1, h2, h3 { color: #2c3e50; } h1 { font-size: 2.5em; } h2 { font-size: 2em; } h3 { font-size: 1.75em; } p { margin: 10px 0; } ul, ol { margin: 10px 0 10px 20px; } table { width: 100%; border-collapse: collapse; margin: 20px 0; } th, td { border: 1px solid #ddd; padding: 8px; } th { background-color: #7b7b7b; color: white; text-align: left; } tr:nth-child(even) { background-color: #f2f2f2; }
-
 Voxel-Based Terrain Rendering
 =============================
 
