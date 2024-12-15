@@ -8,6 +8,7 @@ We implemented voxel-based terrain rendering using Perspective Projection, lever
 
 BACKGROUND
 ----------
+![background](images/background.png)
 
 **Key Data Structures:**
 
@@ -209,7 +210,8 @@ images concurrently, increasing the utilization of SMs.
     }
     ```
 
-**RESULTS**
+RESULTS
+--------
 
 * **Six Methods Performance**
     The general performance comparison across six different methods is based on a map size of
@@ -382,5 +384,6 @@ resource utilization.
     workload. As a result, performance remains
     unchanged.
 
-**REFERENCES**
-    * Voxel Space: [https://github.com/s-macke/VoxelSpace](https://github.com/s-macke/VoxelSpace)
+REFERENCES
+--------
+* Voxel Space: [https://github.com/s-macke/VoxelSpace](https://github.com/s-macke/VoxelSpace)
