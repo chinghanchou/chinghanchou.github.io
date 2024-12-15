@@ -222,7 +222,7 @@ task. The number of streams depends on how many images are rendered simultaneous
 Streaming implementation executes perspective projection and column drawing of different
 images concurrently, increasing the utilization of SMs.
 
-![stream](images/stream.png)
+    ![stream](images/stream.png)
 
     ```cpp
     for(total_frames / N){
