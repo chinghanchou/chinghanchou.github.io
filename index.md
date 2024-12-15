@@ -12,27 +12,60 @@ BACKGROUND
 
 **Key Data Structures:**
 
-*   **Height Map:** A 2D array that stores the elevation data of the terrain.
-*   **Color Map:** A 2D array that stores RGB color data for terrain points.
-*   **Screen Buffer:** A 1D array representing the rendered image.
-*   **Hidden Buffer:** Tracks the lowest visible height for occlusion handling.
-*   **Depth Pixel:** Facilitates parallel rendering by storing projected height and color information.
+*   **Height Map heightMap:** A 2D array of size
+MAP_SIZE x MAP_SIZE.
+Stores the elevation data of the terrain for each
+point in the grid and provides height values to
+calculate the projected screen position of each
+terrain point.
+*   **Color Map colorMap:** AA 2D array of size
+MAP_SIZE x MAP_SIZE.
+Stores the RGB color data (0xRRGGBB) corresponding to each point in the grid and
+supplies the color for the pixels on the screen corresponding to the terrain.
+*   **Screen Buffer screen:** A 1D array of size WIDTH * HEIGHT.
+Represents the output image where the rendered terrain is drawn. The final color is stored for each pixel.
+*   **Hidden Buffer hidden:** A 1D array of size WIDTH.
+Tracks the lowest visible height for each column of the screen during rendering. Used for occlusion handling, ensuring that farther terrain points do not overwrite closer ones.
+*   **Depth Pixel (Added in Parallel version) depthPixel:** A custom structure to store the projected height of the point and the color of the column.
+Facilitates parallel rendering by allowing depth layers to be processed separately and later merged into the screen buffer.
+
 
 **Key Operations:**
 
-*   Depth Iteration: Iterates depths from front to back.
-*   Column Iteration: Renders vertical lines for the screen columns.
-*   Perspective Projection: Maps 3D terrain to 2D screen coordinates.
-*   Column Drawing: Draws visible terrain between depths.
-*   Occlusion Handling: Ensures only visible terrain is rendered.
+1.   Depth Iteration: Iterates through depths from the front to the back, progressively rendering closer terrain points before farther ones.
+2.   Column Iteration: Iterates vertical lines through the width from left to right of the screen.
+3.   Transforms 3D terrain points to 2D screen coordinates, scaling the height based on the observer’s distance and perspective angle.
+4.   Column Drawing: For each column, renders the terrain by filling pixels between the visible height and the previous height.
+
+5.   Occlusion Handling: Compares the projected height of each terrain point with the current value in the hidden buffer and updates the screen and hidden to render only the visible terrain.
+
+
+```cpp
+void DrawFrontToBack(...) {
+  for depthNum { // Depth Iteration
+    for width { // Column Iteration
+      // Perspective Projection
+      for verticalPixel { // Column Drawing
+        // Occlusion Handling
+        screen[i] = color
+      }
+      updateHiddenValue()
+    }
+  }
+}
+```
+
+![occlusion](images/occlusion.png)
 
 **What are the algorithm’s inputs and outputs?**
 
-**Inputs:***   Height Map picture: Represents the terrain’s elevation data.
-*   Color Map picture: Provides the terrain’s surface colors.
-*   Rendering parameters: such as observer position, perspective angle, and depth.
-**Outputs:***   Screen: Contains the final rendered terrain image as a pixel buffer.
-*   PNG file (Optionally): The rendered image is saved as a PNG file to visualize results.
+* Inputs:   
+    *   Height Map picture: Represents the terrain’s elevation data.
+    *   Color Map picture: Provides the terrain’s surface colors.
+    *   Rendering parameters: such as observer position, perspective angle, and depth.
+*   Outputs:
+    *   Screen: Contains the final rendered terrain image as a pixel buffer.
+    *   PNG file (Optionally): The rendered image is saved as a PNG file to visualize results.
 
 **What is the part that is computationally expensive and could benefit from parallelization?**
 
@@ -60,6 +93,8 @@ BACKGROUND
 
 *   Column Iteration: Similar pixel operations for filling vertical lines make it amenable to SIMD execution.
 *   Perspective Projection: Operations on projecting a 2D map to a first-person perspective are uniform and can leverage SIMD instructions.
+
+![parallel](images/parallel.png)
 
 APPROACH
 --------
