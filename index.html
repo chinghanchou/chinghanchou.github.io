@@ -74,6 +74,51 @@
         <li>Column Drawing: Draws visible terrain between depths.</li>
         <li>Occlusion Handling: Ensures only visible terrain is rendered.</li>
     </ul>
+    <p><strong>What are the algorithm’s inputs and outputs?</strong></p>
+    <ul>
+        <strong>Inputs:</strong></li>
+        <li>Height Map picture: Represents the terrain’s elevation data.</li>
+        <li>Color Map picture: Provides the terrain’s surface colors.</li>
+        <li>Rendering parameters: such as observer position, perspective angle, and depth.</li>
+        <strong>Outputs:</strong></li>
+        <li>Screen: Contains the final rendered terrain image as a pixel buffer.</li>
+        <li>PNG file (Optionally): The rendered image is saved as a PNG file to visualize results.</li>
+    </ul>
+    <p><strong>What is the part that is computationally expensive and could benefit from parallelization?</strong></p>
+    <ul>
+        <li>Column Iteration: Each column is rendered by processing all depths sequentially to
+            ensure correct occlusion. This is computationally expensive, especially for large depth
+            and the distance visible to the observer.</li>
+        <li>Perspective Projection: For each visible terrain segment, it involves multiple memory
+            accesses and calculations, which can be optimized.</li>
+    </ul>
+    <p><strong>Break down the workload. Where are the dependencies in the program? How much
+        parallelism is there? Is it data-parallel? Where is the locality? Is it amenable to SIMD
+        execution?</strong></p>
+    <ul>
+        <p><strong>Dependencies:</strong></p>
+        <li>Column Iteration: Across columns drawing is
+            independent, allowing parallelization at the column
+            level.</li>
+        <li>Depth Iteration: Within columns is dependent,
+            processing sequentially due to occlusion
+            dependencies.</li>
+        <p><strong>Parallelism:</strong></p>
+        <li>Column Iteration: Parallel threads can process multiple columns simultaneously.</li>
+        <li>Depth Iteration: Perspective Projection: The operation to retrieve pixel data can be processed in parallel
+            before starting to draw vertical lines.</li>
+        <p><strong>Locality:</strong></p>
+        <li>Spatial Locality: Perspective projection reads nearby pixels from heightmap and
+            colormap. Screen rendering writes to nearby pixels/memory addresses to screen.</li>
+        <li>Temporal Locality: Successive depths within a column frequently update and check the
+            hidden and screen.</li>
+        <p><strong>SIMD Suitability:</strong></p>
+        <li>Column Iteration: Similar pixel operations for filling vertical lines make it amenable to
+            SIMD execution.</li>
+        <li>Perspective Projection: Operations on projecting a 2D map to a first-person perspective
+            are uniform and can leverage SIMD instructions.</li>
+    </ul>
+
 
     <h2>APPROACH</h2>
     <p><strong>Technologies Used:</strong></p>
