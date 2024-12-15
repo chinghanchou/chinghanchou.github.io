@@ -390,6 +390,7 @@ resource utilization.
 * **Visible Distance**
 
     ![visible](images/visibledistance.png)
+    
     The number of depth iterations equals Visible
     Distance / Depth. Therefore, the decrease in
     Visible Distance should lead to speedup as both
@@ -402,6 +403,7 @@ resource utilization.
 * **Screen Size(Width)**
 
     ![width](images/width.png)
+    
     Reducing the output screen width from 700
     pixels to 350 pixels resulted in a 2x speedup for
     the serial implementation, as the total
@@ -422,6 +424,7 @@ resource utilization.
 * **Screen Size(Height)**
 
     ![height](images/height.png)
+    
     Reducing the output screen height from 512
     pixels to 256 pixels had no impact on
     performance across all implementations. This is
