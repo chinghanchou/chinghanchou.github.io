@@ -1,5 +1,6 @@
 Voxel-Based Terrain Rendering
 =============================
+Student: Ching Han Chou, Connie Liu
 
 SUMMARY
 -------
