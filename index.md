@@ -64,7 +64,7 @@ void DrawFrontToBack(...) {
 }
 ```
 
-![screen](images/screen.png)
+<img src="images/screen.png" width=300 height=350>
 
 ![occlusion](images/occlusion.png)
 
