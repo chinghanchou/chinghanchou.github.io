@@ -64,6 +64,8 @@ void DrawFrontToBack(...) {
 }
 ```
 
+![screen](images/screen.png)
+
 ![occlusion](images/occlusion.png)
 
 **What are the algorithm’s inputs and outputs?**
